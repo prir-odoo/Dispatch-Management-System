@@ -9,8 +9,10 @@ class StockPickingBatch(models.Model):
     vehicule_id = fields.Many2one("fleet.vehicle", string="Vehicule")
     vehicle_category_id = fields.Many2one("fleet.vehicle.model.category", string="Vehicle Category")
     
-    weight = fields.Float(string="Weight", compute="_compute_weight", readonly=True)
-    volume = fields.Float(string="Volume", compute="_compute_volume", readonly=True)
+    weight = fields.Float(string="Weight", compute="_compute_weight", readonly=True, store=True)
+    volume = fields.Float(string="Volume", compute="_compute_volume", readonly=True, store=True)
+
+    volume_picking = fields.Float(string = "Volume", compute="_compute_volume_picking", readonly = True)
 
     @api.depends("move_line_ids", "vehicle_category_id")
     def _compute_weight(self):
@@ -26,5 +28,10 @@ class StockPickingBatch(models.Model):
             total_volume = sum(move_line.product_id.volume * move_line.quantity for move_line in record.move_line_ids if move_line.product_id and move_line.product_id.volume)
             max_volume = record.vehicle_category_id.max_volume
             record.volume = (total_volume / max_volume)*100 if max_volume != 0 else 0.0
+
+    @api.depends("picking_ids")
+    def _compute_volume_picking(self):
+        for record in self:
+            record.volume_picking = sum(picking.product_id.volume * picking.quantity for picking in record.picking_ids if picking.product_id and picking.product_id.volume)
 
     

@@ -3,7 +3,7 @@
 <odoo>
 
     <record id="inventory_dock_action" model="ir.actions.act_window">
-        <field name="name">Inventory DOck</field>
+        <field name="name">Inventory Dock</field>
         <field name="res_model">inventory.dock</field>
         <field name="view_mode">tree,form,kanban</field>
     </record>
