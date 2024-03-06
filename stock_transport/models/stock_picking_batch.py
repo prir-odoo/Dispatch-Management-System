@@ -11,27 +11,38 @@ class StockPickingBatch(models.Model):
     
     weight = fields.Float(string="Weight", compute="_compute_weight", readonly=True, store=True)
     volume = fields.Float(string="Volume", compute="_compute_volume", readonly=True, store=True)
+    transfer_count = fields.Float(string="Transfers", compute="_compute_transfer_count", store=True)
+    lines_count = fields.Float(string="Lines", compute="_compute_lines", store=True)
 
-    volume_picking = fields.Float(string = "Volume", compute="_compute_volume_picking", readonly = True)
-
-    @api.depends("move_line_ids", "vehicle_category_id")
+    @api.depends("picking_ids.weight_picking", "vehicle_category_id")
     def _compute_weight(self):
         for record in self:
-            total_weight = sum(move_line.product_id.weight * move_line.quantity for move_line in record.move_line_ids if move_line.product_id and move_line.product_id.weight)
+            total_weight = sum(p.weight_picking for p in record.picking_ids)
             max_weight = record.vehicle_category_id.max_weight
             record.weight = (total_weight / max_weight)*100 if max_weight != 0 else 0.0
 
 
-    @api.depends("move_line_ids", "vehicle_category_id")
+    @api.depends("picking_ids.volume_picking", "vehicle_category_id")
     def _compute_volume(self):
         for record in self:
-            total_volume = sum(move_line.product_id.volume * move_line.quantity for move_line in record.move_line_ids if move_line.product_id and move_line.product_id.volume)
+            total_volume = sum(p.volume_picking for p in record.picking_ids)
             max_volume = record.vehicle_category_id.max_volume
             record.volume = (total_volume / max_volume)*100 if max_volume != 0 else 0.0
 
-    @api.depends("picking_ids")
-    def _compute_volume_picking(self):
+    @api.depends('picking_ids')
+    def _compute_transfer_count(self):
         for record in self:
-            record.volume_picking = sum(picking.product_id.volume * picking.quantity for picking in record.picking_ids if picking.product_id and picking.product_id.volume)
+            record.transfer_count = len(record.picking_ids)
+    
+    @api.depends('move_line_ids')
+    def _compute_lines(self):
+        for record in self:
+            record.lines_count = len(record.move_line_ids)
 
+    @api.depends('weight' , 'volume')
+    def _compute_display_name(self):
+        for record in self:
+            record.display_name = record.name + " (" + str(record.weight) + "kg, " + str(record.volume) + "m\u00b3)"
+
+    
     

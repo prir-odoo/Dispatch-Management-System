@@ -34,6 +34,8 @@
                     <field name="weight" type="measure" />
                     <field name="scheduled_date"  type="row"/>
                     <field name="vehicle_category_id" type="column"/>
+                    <field name="transfer_count" />
+                    <field name="lines_count" />
                 </graph>
         </field>
     </record>
@@ -46,8 +48,12 @@
             date_start="create_date"
             date_stop="scheduled_date"
             default_group_by="dock_id,vehicule_id"
+            default_scale = "week"
             color="vehicule_id"
+            decoration-info="state == 'draft'"
+            res_id = ""
             >
+            <field name="state" />
             </gantt>
         </field>
     </record>
