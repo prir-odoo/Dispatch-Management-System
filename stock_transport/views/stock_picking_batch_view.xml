@@ -16,8 +16,19 @@
                 <field name="dock_id"/>
                 <field name="vehicule_id"/>
                 <field name="vehicle_category_id" placeholder="e.g. Semi-Trucks"/>
-                <field name="weight" widget="progressbar" invisible="not vehicle_category_id"/>
-                <field name="volume" widget="progressbar" invisible="not vehicle_category_id"/>
+                
+                <label for='total_weight' string='Weight'/>
+                    <div class="o_row">
+                        <span><field name='total_weight'/></span>
+                        <div><field name='weight' widget='progressbar' invisible='not vehicle_category_id'/></div>
+                    </div>
+                <label for='total_volume' string='volume'/>
+                <div class="o_row">
+                    <span><field name='total_volume'/></span>
+                    <div><field name='volume' class='oe_inline' widget='progressbar' invisible='not vehicle_category_id'/></div>
+                </div>
+                <!-- <field name="weight" widget="progressbar" invisible="not vehicle_category_id"/>
+                <field name="volume" widget="progressbar" invisible="not vehicle_category_id"/> -->
                 
             </xpath>
             
@@ -51,9 +62,17 @@
             default_scale = "week"
             color="vehicule_id"
             decoration-info="state == 'draft'"
-            res_id = ""
             >
             <field name="state" />
+            <field name="name"/>
+            <field name="weight"/>
+            <field name="volume"/>
+            <templates>
+                <div>
+                    <div id="allocated_hours"><strong>Allocated Time — </strong> <t t-esc="weight"/></div>
+                    
+                </div>
+            </templates>
             </gantt>
         </field>
     </record>
